@@ -1,0 +1,24 @@
+{
+    "name": "nex/yii2-graylog2",
+    "type": "yii2-extension",
+    "description": "Graylog2 log target for Yii2",
+    "keywords": ["yii2", "extension", "log", "log target", "graylog", "graylog2", "gelf"],
+    "homepage": "https://github.com/RomeroMsk/yii2-graylog2",
+    "license": "BSD 3-Clause",
+    "authors": [
+        {
+            "name": "Roman Ovchinnikov",
+            "email": "nex.software@gmail.com",
+            "homepage": "https://github.com/RomeroMsk"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*",
+        "graylog2/gelf-php": "~1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "nex\\graylog\\": ""
+        }
+    }
+}

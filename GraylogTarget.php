@@ -17,7 +17,7 @@ use Psr\Log\LogLevel;
  * GraylogTarget sends log to Graylog2 (in GELF format)
  *
  * @author Roman Ovchinnikov <nex.software@gmail.com>
- * @link https://github.com/RomeroMsk/yii2-chosen
+ * @link https://github.com/RomeroMsk/yii2-graylog2
  */
 class GraylogTarget extends Target
 {
