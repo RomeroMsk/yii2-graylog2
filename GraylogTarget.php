@@ -8,6 +8,7 @@ namespace nex\graylog;
 
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 use yii\log\Target;
 use yii\log\Logger;
 use Gelf;
@@ -57,9 +58,10 @@ class GraylogTarget extends Target
         $publisher = new Gelf\Publisher($transport);
         foreach ($this->messages as $message) {
             $gelfMsg = new Gelf\Message();
-            $gelfMsg->setShortMessage($message[0])
-                ->setFullMessage($message[0])
-                ->setLevel(ArrayHelper::getValue($this->_levels, $message[1]))
+            $msg = is_string($message[0]) ? $message[0] : VarDumper::export($message[0]);
+            $gelfMsg->setShortMessage($msg)
+                ->setFullMessage($msg)
+                ->setLevel(ArrayHelper::getValue($this->_levels, $message[1], LogLevel::INFO))
                 ->setTimestamp($message[3])
                 ->setFacility($this->facility);
             if (isset($message[4][0]['file'])) {
