@@ -78,7 +78,7 @@ class GraylogTarget extends Target
                 }
                 // If 'full' is set will use it as fullMessage (note that all other stuff in log message will not be logged, except 'short' and 'add')
                 if ($full !== null) {
-                    $gelfMsg->setFullMessage($full);
+                    $gelfMsg->setFullMessage(VarDumper::export($full));
                 }
                 // Process additionals array (only with string keys)
                 if (is_array($add)) {
