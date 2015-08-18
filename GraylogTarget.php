@@ -38,6 +38,11 @@ class GraylogTarget extends Target
     public $facility = 'yii2-logs';
 
     /**
+    * @var boolean whether to add authenticated user username to additional fields
+    */
+    public $addUsername = false;
+
+    /**
      * @var array graylog levels
      */
     private $_levels = [
@@ -108,6 +113,10 @@ class GraylogTarget extends Target
                     }
                 }
                 $gelfMsg->setAdditional('trace', implode("\n", $traces));
+            }
+            // Add username
+            if (($this->addUsername) && (Yii::$app->has('user')) && ($user = Yii::$app->get('user')) && ($identity = $user->getIdentity(false))) {
+                $gelfMsg->setAdditional('username', $identity->username);
             }
             // Publish message
             $publisher->publish($gelfMsg);
