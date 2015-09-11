@@ -2,7 +2,7 @@
 /**
  * @copyright Copyright (c) 2014 Roman Ovchinnikov
  * @link https://github.com/RomeroMsk
- * @version 1.0.0
+ * @version 1.0.1
  */
 namespace nex\graylog;
 
@@ -64,6 +64,13 @@ class GraylogTarget extends Target
         foreach ($this->messages as $message) {
             list($text, $level, $category, $timestamp) = $message;
             $gelfMsg = new Gelf\Message;
+            // Set base parameters
+            $gelfMsg->setLevel(ArrayHelper::getValue($this->_levels, $level, LogLevel::INFO))
+                ->setTimestamp($timestamp)
+                ->setFacility($this->facility)
+                ->setAdditional('category', $category)
+                ->setFile('unknown')
+                ->setLine(0);
             // For string log message set only shortMessage
             if (is_string($text)) {
                 $gelfMsg->setShortMessage($text);
@@ -102,11 +109,6 @@ class GraylogTarget extends Target
                     }
                 }
             }
-            // Set base parameters
-            $gelfMsg->setLevel(ArrayHelper::getValue($this->_levels, $level, LogLevel::INFO))
-                ->setTimestamp($timestamp)
-                ->setFacility($this->facility)
-                ->setAdditional('category', $category);
             // Set 'file', 'line' and additional 'trace', if log message contains traces array
             if (isset($message[4]) && is_array($message[4])) {
                 $traces = [];
