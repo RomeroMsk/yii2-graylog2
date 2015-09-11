@@ -67,6 +67,11 @@ class GraylogTarget extends Target
             // For string log message set only shortMessage
             if (is_string($text)) {
                 $gelfMsg->setShortMessage($text);
+            } elseif ($text instanceof \Exception) {
+                $gelfMsg->setShortMessage('Exception ' . get_class($text) . ': ' . $text->getMessage());
+                $gelfMsg->setFullMessage((string) $text);
+                $gelfMsg->setLine($text->getLine());
+                $gelfMsg->setFile($text->getFile());
             } else {
                 // If log message contains special keys 'short', 'full' or 'add', will use them as shortMessage, fullMessage and additionals respectively
                 $short = ArrayHelper::remove($text, 'short');
