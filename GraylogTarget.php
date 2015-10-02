@@ -88,21 +88,21 @@ class GraylogTarget extends Target
                 if ($short !== null) {
                     $gelfMsg->setShortMessage($short);
                     // All remaining message is fullMessage by default
-                    $gelfMsg->setFullMessage(VarDumper::export($text));
+                    $gelfMsg->setFullMessage(VarDumper::dumpAsString($text));
                 } else {
                     // Will use log message as shortMessage by default (no need to add fullMessage in this case)
-                    $gelfMsg->setShortMessage(VarDumper::export($text));
+                    $gelfMsg->setShortMessage(VarDumper::dumpAsString($text));
                 }
                 // If 'full' is set will use it as fullMessage (note that all other stuff in log message will not be logged, except 'short' and 'add')
                 if ($full !== null) {
-                    $gelfMsg->setFullMessage(VarDumper::export($full));
+                    $gelfMsg->setFullMessage(VarDumper::dumpAsString($full));
                 }
                 // Process additionals array (only with string keys)
                 if (is_array($add)) {
                     foreach ($add as $key => $val) {
                         if (is_string($key)) {
                             if (!is_string($val)) {
-                                $val = VarDumper::export($val);
+                                $val = VarDumper::dumpAsString($val);
                             }
                             $gelfMsg->setAdditional($key, $val);
                         }
