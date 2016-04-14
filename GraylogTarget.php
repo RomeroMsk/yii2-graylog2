@@ -80,7 +80,7 @@ class GraylogTarget extends Target
                 $gelfMsg->setLine($text->getLine());
                 $gelfMsg->setFile($text->getFile());
                 if($text->getTrace()!=null){
-                    $gelfMsg->setAdditional('stacktrace', VarDumper::dumpAsString($text->getTrace()));
+                    $gelfMsg->setAdditional('stacktrace', substr(VarDumper::dumpAsString($text->getTrace())),0,32760);
                     foreach ($text->getTrace() as $stacktrace){
                         foreach ($stacktrace['args'] as $args){
                             if($args instanceof \yii\web\Request){
