@@ -38,13 +38,13 @@ class GraylogTarget extends Target
     public $facility = 'yii2-logs';
 
     /**
-     * @var string default tag name
+     * @var array default additional fields
      */
-    public $tag = 'yii2-logs';
+    public $additionalFields = [];
 
     /**
-    * @var boolean whether to add authenticated user username to additional fields
-    */
+     * @var boolean whether to add authenticated user username to additional fields
+     */
     public $addUsername = false;
 
     /**
@@ -74,7 +74,6 @@ class GraylogTarget extends Target
                 ->setTimestamp($timestamp)
                 ->setFacility($this->facility)
                 ->setAdditional('category', $category)
-                ->setAdditional('tag', $this->tag)
                 ->setFile('unknown')
                 ->setLine(0);
             // For string log message set only shortMessage
@@ -130,6 +129,21 @@ class GraylogTarget extends Target
             // Add username
             if (($this->addUsername) && (Yii::$app->has('user')) && ($user = Yii::$app->get('user')) && ($identity = $user->getIdentity(false))) {
                 $gelfMsg->setAdditional('username', $identity->username);
+            }
+            // Add any additional fields the user specifies
+            foreach ($this->additionalFields as $key => $value) {
+                if (is_string($key) && !empty($key)) {
+                    if (is_callable($value)) {
+                        $value = $value(Yii::$app);
+                    }
+                    if (!is_string($value) && !empty($value)) {
+                        $value = VarDumper::dumpAsString($value);
+                    }
+                    if (empty($value)) {
+                        continue;
+                    }
+                    $gelfMsg->setAdditional($key, $value);
+                }
             }
             // Publish message
             $publisher->publish($gelfMsg);
