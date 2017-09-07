@@ -38,6 +38,11 @@ class GraylogTarget extends Target
     public $facility = 'yii2-logs';
 
     /**
+     * @var string default tag name
+     */
+    public $tag = 'yii2-logs';
+
+    /**
     * @var boolean whether to add authenticated user username to additional fields
     */
     public $addUsername = false;
@@ -69,6 +74,7 @@ class GraylogTarget extends Target
                 ->setTimestamp($timestamp)
                 ->setFacility($this->facility)
                 ->setAdditional('category', $category)
+                ->setAdditional('tag', $this->tag)
                 ->setFile('unknown')
                 ->setLine(0);
             // For string log message set only shortMessage
