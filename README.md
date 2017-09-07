@@ -46,6 +46,7 @@ return [
                     'logVars' => [], // This prevent yii2-debug from crashing ;)
                     'host' => '127.0.0.1',
                     'facility' => 'facility-name',
+                    'tag' => 'tag-name',
                 ],
             ],
         ],
