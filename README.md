@@ -15,6 +15,12 @@ Either run
 php composer.phar require "krisengine/yii2-graylog2" "*"
 ```
 
+or run
+
+```
+composer require "krisengine/yii2-graylog2" "*"
+```
+
 or add
 
 ```json
