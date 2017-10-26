@@ -4,7 +4,7 @@
  * @link https://github.com/RomeroMsk
  * @version 1.0.1
  */
-namespace nex\graylog;
+namespace krisengine\graylog;
 
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -13,6 +13,7 @@ use yii\log\Target;
 use yii\log\Logger;
 use Gelf;
 use Psr\Log\LogLevel;
+use yii\base\InvalidConfigException;
 
 /**
  * GraylogTarget sends log to Graylog2 (in GELF format)
@@ -31,6 +32,41 @@ class GraylogTarget extends Target
      * @var integer Graylog2 port
      */
     public $port = 12201;
+
+    /**
+     * @var string GELF transport udp, tcp http or https
+     */
+    public $transport = 'udp';
+
+    /**
+     * @var boolean Enable certificate validation of remote party (GELF transport https)
+     */
+    public $sslVerifyPeer = true;
+
+    /**
+     * @var boolean Allow self-signed certificates (GELF transport https)
+     */
+    public $sslAllowSelfSigned = true;
+
+    /**
+     * @var string|null Path to custom CA (GELF transport https)
+     */
+    public $sslCaFile = null;
+
+    /**
+     * @var string|null List of ciphers the SSL layer may use. Formatted as specified in `ciphers(1)` (GELF transport https)
+     */
+    public $sslCiphers = null;
+
+    /**
+     * @var string|null Username for HTTP basic authentication (GELF transport http or https)
+     */
+    public $httpUsername = null;
+
+    /**
+     * @var string|null Password for HTTP basic authentication (GELF transport http or https)
+     */
+    public $httpPassword = null;
 
     /**
      * @var string default facility name
@@ -64,7 +100,33 @@ class GraylogTarget extends Target
      */
     public function export()
     {
-        $transport = new Gelf\Transport\UdpTransport($this->host, $this->port, Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN);
+        switch ($this->transport) {
+            case 'udp':
+                $transport = new Gelf\Transport\UdpTransport($this->host, $this->port, Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN);
+                break;
+            case 'tcp':
+                $transport = new Gelf\Transport\TcpTransport($this->host, $this->port);
+                break;
+            case 'http':
+                $transport = new Gelf\Transport\HttpTransport($this->host, $this->port);
+                if($this->httpUsername && $this->httpPassword){
+                    $transport->setAuthentication($this->httpUsername, $this->httpPassword);
+                }
+                break;
+            case 'https':
+                $sslOptions = new Gelf\Transport\SslOptions();
+                $sslOptions->setVerifyPeer($this->sslVerifyPeer);
+                $sslOptions->setAllowSelfSigned($this->sslAllowSelfSigned);
+                $sslOptions->setCaFile($this->sslCaFile);
+                $sslOptions->setCiphers($this->sslCiphers);
+                $transport = new Gelf\Transport\HttpTransport($this->host, $this->port, null, $sslOptions);
+                if($this->httpUsername && $this->httpPassword){
+                    $transport->setAuthentication($this->httpUsername, $this->httpPassword);
+                }
+                break;
+            default:
+                throw new InvalidConfigException("Incorrect transport {$this->transport}. Use transport udp, tcp http or https");
+        }
         $publisher = new Gelf\Publisher($transport);
         foreach ($this->messages as $message) {
             list($text, $level, $category, $timestamp) = $message;

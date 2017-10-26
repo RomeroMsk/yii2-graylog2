@@ -12,13 +12,19 @@ The preferred way to install this extension is through [composer](http://getcomp
 Either run
 
 ```
-php composer.phar require "nex/yii2-graylog2" "*"
+php composer.phar require "krisengine/yii2-graylog2" "*"
+```
+
+or run
+
+```
+composer require "krisengine/yii2-graylog2" "*"
 ```
 
 or add
 
 ```json
-"nex/yii2-graylog2" : "*"
+"krisengine/yii2-graylog2" : "*"
 ```
 
 to the `require` section of your application's `composer.json` file.
@@ -40,12 +46,19 @@ return [
                     'levels' => ['error', 'warning'],
                 ],
                 'graylog' => [
-                    'class' => 'nex\graylog\GraylogTarget',
+                    'class' => 'krisengine\graylog\GraylogTarget',
                     'levels' => ['error', 'warning', 'info'],
                     'categories' => ['application'],
                     'logVars' => [], // This prevent yii2-debug from crashing ;)
                     'host' => '127.0.0.1',
                     'facility' => 'facility-name',
+                    'transport' => 'udp', //GELF transport udp, tcp http or https
+                    'sslVerifyPeer' => true, //Enable certificate validation of remote party (GELF transport https)
+                    'sslAllowSelfSigned' => true, //Allow self-signed certificates (GELF transport https)
+                    'sslCaFile' => null, //Path to custom CA (GELF transport https)
+                    'sslCiphers' => null, //List of ciphers the SSL layer may use. Formatted as specified in `ciphers(1)` (GELF transport https)
+                    'httpUsername' => true, //Username for HTTP basic authentication (GELF transport http or https)
+                    'httpPassword' => true, //Password for HTTP basic authentication (GELF transport http or https)
                     'additionalFields' => [
                         'user-ip' => function($yii) {
                             return $yii->request->getUserIP();
@@ -87,7 +100,7 @@ Yii::info([
         'additional2' => 'def',
     ],
 ]);
-
+ 
 // short_message will contain 'Test short message',
 // two additional fields will be sent,
 // full_message will contain 'Test full message', all other stuff will be lost
