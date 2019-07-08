@@ -48,6 +48,11 @@ class GraylogTarget extends Target
     public $addUsername = false;
 
     /**
+     * @var int chunk size
+     */
+    public $chunkSize = Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN;
+
+    /**
      * @var array graylog levels
      */
     private $_levels = [
@@ -64,7 +69,7 @@ class GraylogTarget extends Target
      */
     public function export()
     {
-        $transport = new Gelf\Transport\UdpTransport($this->host, $this->port, Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN);
+        $transport = new Gelf\Transport\UdpTransport($this->host, $this->port, $this->chunkSize);
         $publisher = new Gelf\Publisher($transport);
         foreach ($this->messages as $message) {
             list($text, $level, $category, $timestamp) = $message;
