@@ -89,6 +89,19 @@ class GraylogTarget extends Target
                 $gelfMsg->setFullMessage((string) $text);
                 $gelfMsg->setLine($text->getLine());
                 $gelfMsg->setFile($text->getFile());
+                if($text->getTrace()!=null){
+                    $gelfMsg->setAdditional('stacktrace', substr(VarDumper::dumpAsString($text->getTrace())),0,32760);
+                    foreach ($text->getTrace() as $stacktrace){
+                        foreach ($stacktrace['args'] as $args){
+                            if($args instanceof \yii\web\Request){
+                                $gelfMsg->setAdditional('request_url', $args->getUrl());
+                            }
+                        }
+                    }
+                }
+                if($text->getPrevious()!=null){
+                    $gelfMsg->setAdditional('previous_exception', VarDumper::dumpAsString($text->getPrevious()));
+                }
             } else {
                 // If log message contains special keys 'short', 'full' or 'add', will use them as shortMessage, fullMessage and additionals respectively
                 $short = ArrayHelper::remove($text, 'short');
