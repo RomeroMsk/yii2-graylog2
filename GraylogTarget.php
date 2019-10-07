@@ -53,6 +53,11 @@ class GraylogTarget extends Target
     public $chunkSize = Gelf\Transport\UdpTransport::CHUNK_SIZE_LAN;
 
     /**
+     * @var string classname of the Transport object
+     */
+    public $transportClass = Gelf\Transport\UdpTransport::class;
+
+    /**
      * @var array graylog levels
      */
     private $_levels = [
@@ -69,7 +74,7 @@ class GraylogTarget extends Target
      */
     public function export()
     {
-        $transport = new Gelf\Transport\UdpTransport($this->host, $this->port, $this->chunkSize);
+        $transport = $this->getTransport();
         $publisher = new Gelf\Publisher($transport);
         foreach ($this->messages as $message) {
             list($text, $level, $category, $timestamp) = $message;
@@ -152,6 +157,22 @@ class GraylogTarget extends Target
             }
             // Publish message
             $publisher->publish($gelfMsg);
+        }
+    }
+
+    /**
+     * @return object
+     * @throws \yii\base\InvalidConfigException
+     */
+    protected function getTransport()
+    {
+        switch ($this->transportClass) {
+            case Gelf\Transport\UdpTransport::class:
+                return Yii::createObject($this->transportClass, [$this->host, $this->port, $this->chunkSize]);
+                break;
+            default:
+                return Yii::createObject($this->transportClass, [$this->host, $this->port]);
+                break;
         }
     }
 }
